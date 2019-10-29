@@ -104,14 +104,15 @@ class Tap(ArgumentParser):
             var_type = self._annotations[variable]
 
             # If type is not explicitly provided, set it if it's one of our supported default types
-            if 'type' not in kwargs:
-                if var_type not in SUPPORTED_DEFAULT_TYPES:
-                    raise ValueError(
-                        f'Variable "{variable}" has type "{var_type}" which is not supported by default.\n'
-                        f'Please explicitly add the argument to the parser by writing:\n\n'
-                        f'def add_arguments(self) -> None:\n'
-                        f'    self.add_argument("--{variable}", type=func, {"required=True" if kwargs["required"] else f"default={getattr(self, variable)}"})\n\n'
-                        f'where "func" maps from str to {var_type}.')
+            if 'type' not in kwargs and var_type in SUPPORTED_DEFAULT_TYPES:
+                # TODO: decide if/how we want to remove the error when not using a supported default type
+                # if var_type not in SUPPORTED_DEFAULT_TYPES:
+                #     raise ValueError(
+                #         f'Variable "{variable}" has type "{var_type}" which is not supported by default.\n'
+                #         f'Please explicitly add the argument to the parser by writing:\n\n'
+                #         f'def add_arguments(self) -> None:\n'
+                #         f'    self.add_argument("--{variable}", type=func, {"required=True" if kwargs["required"] else f"default={getattr(self, variable)}"})\n\n'
+                #         f'where "func" maps from str to {var_type}.')
 
                 # If Optional type, extract type
                 if var_type in SUPPORTED_DEFAULT_OPTIONAL_TYPES:

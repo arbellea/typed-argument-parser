@@ -211,6 +211,9 @@ def get_literals(literal: Literal, variable: str) -> Tuple[Callable[[str], Any],
 
     str_to_literal = {str(literal): literal for literal in literals}
 
+    if len(literals) != len(str_to_literal):
+        raise ValueError('All literals must have unique string representations')
+
     def var_type(arg: str) -> Any:
         return str_to_literal[arg]
 

@@ -222,11 +222,16 @@ class GetLiteralsTests(TestCase):
         with self.assertRaises(KeyError):
             literal_f(3)
 
+    def test_get_literals_primitives(self) -> None:
+        with self.assertRaises(ValueError):
+            literal_f, prims = get_literals(Literal['two', 2, '2'], 'number')
+
     def test_get_literals_empty(self) -> None:
         literal_f, prims = get_literals(Literal, 'hi')
         self.assertEqual(prims, [])
         with self.assertRaises(KeyError):
             literal_f(None)
+
 
 if __name__ == '__main__':
     unittest.main()

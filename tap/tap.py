@@ -180,7 +180,8 @@ class Tap(ArgumentParser):
                 ):
                     var_type, kwargs['choices'] = get_literals(get_args(var_type)[0], variable)
                 elif var_type not in SUPPORTED_DEFAULT_TYPES:
-                    arg_params = "required=True" if kwargs["required"] else f"default={getattr(self, variable)}"
+                    is_required = kwargs.get('required', False)
+                    arg_params = 'required=True' if is_required else f'default={getattr(self, variable)}'
                     raise ValueError(
                         f'Variable "{variable}" has type "{var_type}" which is not supported by default.\n'
                         f'Please explicitly add the argument to the parser by writing:\n\n'
@@ -271,12 +272,11 @@ class Tap(ArgumentParser):
             'command_line': f'python {" ".join(sys.argv)}',
             'time': time.strftime('%c')
         }
-        
+
         if has_git():
             reproducibility['git_root'] = get_git_root()
             reproducibility['git_url'] = get_git_url(commit_hash=True)
             reproducibility['git_has_uncommitted_changes'] = has_uncommitted_changes()
-
 
         return reproducibility
 
@@ -484,12 +484,12 @@ class Tap(ArgumentParser):
         """Saves the arguments and reproducibility information in JSON format, pickling what can't be encoded.
 
         :param path: Path to the JSON file where the arguments will be saved.
+        :param with_reproducibility: If True, adds a "reproducibility" field with information (e.g. git hash)
+                                     to the JSON file.
         """
         with open(path, 'w') as f:
-            if with_reproducibility:
-                json.dump(self._log_all(), f, indent=4, sort_keys=True, cls=PythonObjectEncoder)
-            else:
-                json.dump(self.as_dict(), f, indent=4, sort_keys=True, cls=PythonObjectEncoder)
+            args = self._log_all() if with_reproducibility else self.as_dict()
+            json.dump(args, f, indent=4, sort_keys=True, cls=PythonObjectEncoder)
 
     def load(self,
              path: str,
